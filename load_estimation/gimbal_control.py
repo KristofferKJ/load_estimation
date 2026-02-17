@@ -15,8 +15,9 @@ UDP_PORT = 37260
 LOCAL_PORT = 37261  # Local port to receive responses
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 sock.bind(("", LOCAL_PORT))  # Bind to local port to receive data
-sock.settimeout(2)  # Timeout for receiving data
+sock.settimeout(0.05)  # Timeout for receiving data
 
 def send(cmd):
     if isinstance(cmd, str):
@@ -203,7 +204,7 @@ class GimbalControlNode(Node):
         # ========== timers ==========
         timer_period = 1/30  # 30 Hz
         self.timer_control = self.create_timer(timer_period, self.control_loop)
-        #self.timer_pub_angles = self.create_timer(timer_period, self.publish_load_angles) 
+        self.timer_pub_angles = self.create_timer(timer_period, self.publish_load_angles) 
 
     def publish_load_angles(self):
         yaw, pitch, roll = self.get_attitude()
@@ -315,6 +316,7 @@ def main(args=None):
     rclpy.init(args=args)
     gimbal_control = GimbalControlNode()
     rclpy.spin(gimbal_control)
+    sock.close()
     gimbal_control.destroy_node()
     rclpy.shutdown()
 

@@ -13,9 +13,9 @@ class decode_marker():
 
         self.bits = bits
         self.transitions = transitions
-        print("Generating ring codes for bits:", bits, "transitions:", transitions)
+        #print("Generating ring codes for bits:", bits, "transitions:", transitions)
         self.ring_codes = getRingCodes(bits, transitions)
-        print("Generated ring codes:", self.ring_codes)
+        #print("Generated ring codes:", self.ring_codes)
         self.ring_codes = marker_ids
 
 
@@ -24,7 +24,7 @@ class decode_marker():
         y, x = np.ogrid[-self.r_voting:self.r_voting+1, -self.r_voting:self.r_voting+1]
         self.mask = x*x + y*y <= self.r_voting*self.r_voting
 
-        print(self.mask)
+        #print(self.mask)
 
 
     def extract_and_decode(self, image, center):
@@ -56,7 +56,7 @@ class decode_marker():
                 sample_y = self.r_code_outer + int(self.r_code * math.sin(theta))
                 result = self.circle_vote(marker_bin, sample_x, sample_y)
                 if result is None:
-                    print("circle_vote returned None")
+                    #print("circle_vote returned None")
                     return None
                 sample.append(result)
                 cv2.circle(image, (sample_x+center[0]-self.r_code_outer, sample_y+center[1]-self.r_code_outer), self.r_voting, (0,0,255), -1)
@@ -110,8 +110,8 @@ class decode_marker():
         # binary decision for black/white region
         # print(roi.shape)
         if roi.shape != self.mask.shape:
-            print("ROI shape does not match mask shape")
-            print(f"ROI shape: {roi.shape}, mask shape: {self.mask.shape}, img shape: {img.shape}, cx: {cx}, cy: {cy}, x1: {x1}, x2: {x2}, y1: {y1}, y2: {y2}")
+            #print("ROI shape does not match mask shape")
+            #print(f"ROI shape: {roi.shape}, mask shape: {self.mask.shape}, img shape: {img.shape}, cx: {cx}, cy: {cy}, x1: {x1}, x2: {x2}, y1: {y1}, y2: {y2}")
             cv2.imshow("img", cv2.resize(img * 255, (0,0), fx=10.0, fy=10.0))
             cv2.waitKey(0)
             return None  # default to black if out of bounds

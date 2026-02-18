@@ -34,7 +34,7 @@ class MarkerTracker:
 
     @staticmethod
     def generate_symmetry_detector_kernel(order, kernel_size):
-        # type: (int, int) -> numpy.ndarray
+        # type: (int, int) -> np.ndarray
         value_range = np.linspace(-1, 1, kernel_size)
         temp1 = np.meshgrid(value_range, value_range)
         kernel = temp1[0] + 1j * temp1[1]
@@ -75,7 +75,7 @@ class MarkerTracker:
         # If too many contours are detected, skip the frame. as this takes too long to process, and is always due to noise.
         #print(f"Detected {len(contours)} contours.")
         if len(contours) > 10:
-            print(f"Too many contours detected ({len(contours)}), skipping frame.")
+            #print(f"Too many contours detected ({len(contours)}), skipping frame.")
             return None, 255*thres_img/max_val_thresh
 
         for contour in contours:

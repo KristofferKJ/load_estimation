@@ -212,25 +212,22 @@ class GimbalControlNode(Node):
             return
         
         msg = Vector3()
-        msg.x = yaw
-        msg.y = pitch
+        msg.x = yaw + self.setpoint[0] # add setpoint to get actual angle
+        msg.y = pitch + self.setpoint[1] # add setpoint to get actual angle
         msg.z = roll
         self.publish_load_angles_.publish(msg)
 
     def setpoint_callback(self, msg):
         self.setpoint = [msg.x, msg.y]
-        self.get_logger().info(f"Received new setpoint: {self.setpoint}")
-
+        self.get_logger().info(f"Received new setpoint: {self.setpoint[0]:.2f}, {self.setpoint[1]:.2f}")
 
 
     def control_loop(self):
-        #yaw, pitch, roll = self.get_attitude()
-        #if yaw is None or pitch is None:
-        #    return
-        
         # Set the desired setpoint for yaw and pitch
         yaw_error = self.setpoint[0]
         pitch_error = self.setpoint[1]
+
+        # Wrap angles to [-180, 180]
         wrap_yaw = math.atan2(math.sin(math.radians(yaw_error)), math.cos(math.radians(yaw_error))) * 180 / math.pi
         wrap_pitch = math.atan2(math.sin(math.radians(pitch_error)), math.cos(math.radians(pitch_error))) * 180 / math.pi
 
@@ -241,11 +238,6 @@ class GimbalControlNode(Node):
         # Move gimbal with calculated outputs
         self.move_speed(int(min(100, max(-100, yaw_output))), int(min(100, max(-100, pitch_output))))
         #print(f"yaw_speed: {yaw_output: 6.1f}, pitch_speed: {pitch_output: 6.1f}")
-
-        #if abs(wrap_yaw) < 0.5 and abs(wrap_pitch) < 0.5:
-        #    # Switch setpoint if close enough to current setpoint
-        #    self.setpoint = self.setpoint_2 if self.setpoint == self.setpoint_1 else self.setpoint_1
-        #    self.get_logger().info(f"Switching setpoint to: {self.setpoint}")
         
 
     def center_gimbal(self):
@@ -301,7 +293,7 @@ class GimbalControlNode(Node):
             yaw_speed = toInt(data[14:16]+data[12:14]) / 10.
             pitch_speed = toInt(data[18:20]+data[16:18]) / 10.
             roll_speed = toInt(data[22:24]+data[20:22]) / 10.
-            print(f"Yaw: {yaw: 6.1f}, Pitch: {pitch: 6.1f}, Roll: {roll: 6.1f}, Yaw Speed: {yaw_speed: 6.1f}, Pitch Speed: {pitch_speed: 6.1f}, Roll Speed: {roll_speed: 6.1f}")
+            #print(f"Yaw: {yaw: 6.1f}, Pitch: {pitch: 6.1f}, Roll: {roll: 6.1f}, Yaw Speed: {yaw_speed: 6.1f}, Pitch Speed: {pitch_speed: 6.1f}, Roll Speed: {roll_speed: 6.1f}")
             return yaw, pitch, roll
         return None, None, None
 

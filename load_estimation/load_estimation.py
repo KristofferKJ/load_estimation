@@ -77,7 +77,7 @@ class LoadEstimationNode(Node):
         #self.publish_image_detected_.publish(self.bridge.cv2_to_imgmsg(marker_image.astype(np.uint8), encoding='mono8'))
 
         if marker_positions is not None:
-            self.get_logger().info(f"Found {len(marker_positions)} markers.")
+            #self.get_logger().info(f"Found {len(marker_positions)} markers.")
 
             if len(marker_positions) >= 3:
                 pose = self.LP.estimate_load_pose(marker_positions)
@@ -85,7 +85,7 @@ class LoadEstimationNode(Node):
                 if pose is not None:
                     rvec = pose[0]
                     tvec = pose[1]
-                    print(f"Estimated pose: rvec: {rvec.flatten()}, tvec: {tvec.flatten()}")
+                    #print(f"Estimated pose: rvec: {rvec.flatten()}, tvec: {tvec.flatten()}")
 
                     # calc roll and pitch from tvec
                     x, y, z = tvec[0], tvec[1], tvec[2] # in camera frame to payload frame
@@ -107,11 +107,11 @@ class LoadEstimationNode(Node):
                     self.LP.display_pose(display_frame)
                     self.publish_image_payload_.publish(self.bridge.cv2_to_imgmsg(display_frame, encoding='bgr8'))
                 else:
-                    self.get_logger().info("No markers detected.")
+                    self.get_logger().info("No position estimate.")
                     error = Vector3(x=0.0, y=0.0, z=0.0)
                     self.publish_error_.publish(error)
             else:
-                self.get_logger().info("No markers detected.")
+                self.get_logger().info("Not enough markers detected.")
                 error = Vector3(x=0.0, y=0.0, z=0.0)
                 self.publish_error_.publish(error)
         else:

@@ -196,10 +196,10 @@ class GimbalControlNode(Node):
         
 
         # ========== Publishers ==========
-        self.publish_load_angles_ = self.create_publisher(Vector3, '/gimbal/load_angles', 2)
+        self.publish_load_angles_ = self.create_publisher(Vector3, '/gimbal/world_angles', 2)
 
         # ========== Subscribers ==========
-        self.subscribe_setpoint_ = self.create_subscription(Vector3, '/gimbal/error', self.setpoint_callback, 2)
+        self.subscribe_setpoint_ = self.create_subscription(Vector3, '/gimbal/camera_load_angle', self.setpoint_callback, 2)
 
         # ========== timers ==========
         timer_period = 1/30  # 30 Hz
@@ -212,8 +212,8 @@ class GimbalControlNode(Node):
             return
         
         msg = Vector3()
-        msg.x = yaw + self.setpoint[0] # add setpoint to get actual angle
-        msg.y = pitch + self.setpoint[1] # add setpoint to get actual angle
+        msg.x = yaw #+ self.setpoint[0] # add setpoint to get actual angle
+        msg.y = pitch #+ self.setpoint[1] # add setpoint to get actual angle
         msg.z = roll
         self.publish_load_angles_.publish(msg)
 

@@ -21,7 +21,7 @@ class LoadEstimationNode(Node):
         self.get_logger().info("Load Estimation Node has been started.")
 
         # ========== Publishers ==========
-        self.publish_error_ = self.create_publisher(Vector3, '/gimbal/error', 2)
+        self.publish_camera_load_angle_ = self.create_publisher(Vector3, '/gimbal/camera_load_angle', 2)
         self.publish_image_gray_ = self.create_publisher(Image, '/debug/image_gray', 2)
         self.publish_image_thres_ = self.create_publisher(Image, '/debug/image_thres', 2)
         self.publish_image_detected_ = self.create_publisher(Image, '/debug/image_detected', 2)
@@ -94,8 +94,8 @@ class LoadEstimationNode(Node):
 
                     # Publish the setpoint
                     error = Vector3(x=yaw, y=pitch, z=0.0)
-                    self.publish_error_.publish(error)
-                    self.get_logger().info(f"Published error: yaw: {yaw:.2f}, pitch: {pitch:.2f}")
+                    self.publish_camera_load_angle_.publish(error)
+                    self.get_logger().info(f"Published load camera angle: yaw: {yaw:.2f}, pitch: {pitch:.2f}")
 
                     display_frame = cv_image.copy()
                     for pose in marker_positions:
@@ -109,15 +109,15 @@ class LoadEstimationNode(Node):
                 else:
                     self.get_logger().info("No position estimate.")
                     error = Vector3(x=0.0, y=0.0, z=0.0)
-                    self.publish_error_.publish(error)
+                    self.publish_camera_load_angle_.publish(error)
             else:
                 self.get_logger().info("Not enough markers detected.")
                 error = Vector3(x=0.0, y=0.0, z=0.0)
-                self.publish_error_.publish(error)
+                self.publish_camera_load_angle_.publish(error)
         else:
             self.get_logger().info("No markers detected.")
             error = Vector3(x=0.0, y=0.0, z=0.0)
-            self.publish_error_.publish(error)
+            self.publish_camera_load_angle_.publish(error)
 
                 
 

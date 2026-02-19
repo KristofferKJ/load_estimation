@@ -26,6 +26,8 @@ setup(
         'console_scripts': [
             'load_estimation_node = load_estimation.load_estimation:main',
             'gimbal_control_node = load_estimation.gimbal_control:main',
+            'transformation_node = load_estimation.transformation:main',
+            'video_writer_node = load_estimation.write_video:main',
             #'camera_driver_node = load_estimation.camera_driver:main',
         ],
     },

@@ -28,6 +28,7 @@ setup(
             'gimbal_control_node = load_estimation.gimbal_control:main',
             'transformation_node = load_estimation.transformation:main',
             'video_writer_node = load_estimation.write_video:main',
+            'save_dateset_node = load_estimation.save_dataset:main',
             #'camera_driver_node = load_estimation.camera_driver:main',
         ],
     },

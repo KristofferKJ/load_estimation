@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from geometry_msgs.msg import Vector3
+from geometry_msgs.msg import Vector3, Pose
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 
@@ -11,6 +11,7 @@ import cv2
 import time
 import math
 import numpy as np
+from scipy.spatial.transform import Rotation as R
 #import cProfile # For profiling
 
 
@@ -26,7 +27,7 @@ class LoadEstimationNode(Node):
         self.publish_image_thres_ = self.create_publisher(Image, '/debug/image_thres', 2)
         self.publish_image_detected_ = self.create_publisher(Image, '/debug/image_detected', 2)
         self.publish_image_payload_ = self.create_publisher(Image, '/debug/image_payload', 2)
-        self.publish_load_pose_ = self.create_publisher(Vector3, '/payload/pose', 2)
+        self.publish_load_pose_ = self.create_publisher(Pose, '/payload/pose', 2)
 
         # ========== Subscribers ==========
         self.subscribe_image_ = self.create_subscription(Image, '/image_raw', self.image_callback, 2)
@@ -53,12 +54,19 @@ class LoadEstimationNode(Node):
         #                    marker_ids[3]: (-0.16, 0.16, 0.0)}
         
         marker_ids = [17, 27, 39, 51, 95, 119]
-        marker_placements = {marker_ids[0]: (0.2545, -0.2614, -0.0049),
-                             marker_ids[1]: (0.3354, 0.0048, 0.0469),
-                             marker_ids[2]: (0.2648, 0.2665, -0.0079),
-                             marker_ids[3]: (-0.2653, 0.279, -0.0075),
-                             marker_ids[4]: (-0.3502, 0.0156, 0.0472),
-                             marker_ids[5]: (-0.2772, -0.2497, -0.0037)} # Note: This assumes marker_ids[5] is the last marker in the list
+        #marker_placements = {marker_ids[0]: (0.2545, -0.2614, -0.0049),
+        #                     marker_ids[1]: (0.3354, 0.0048, 0.0469),
+        #                     marker_ids[2]: (0.2648, 0.2665, -0.0079),
+        #                     marker_ids[3]: (-0.2653, 0.279, -0.0075),
+        #                     marker_ids[4]: (-0.3502, 0.0156, 0.0472),
+        #                     marker_ids[5]: (-0.2772, -0.2497, -0.0037)}
+        
+        marker_placements = {marker_ids[0]: (0.264, -0.264, 0.0),
+                             marker_ids[1]: (0.342, 0.0, -0.05),
+                             marker_ids[2]: (0.264, 0.264, 0.0),
+                             marker_ids[3]: (-0.264, 0.264, 0.0),
+                             marker_ids[4]: (-0.342, 0.0, -0.05),
+                             marker_ids[5]: (-0.264, -0.264, 0.0)}
 
         self.downscale_factor = 1
         self.LP = PoseEstimator(intrinsics, dist_coeffs, marker_ids, marker_placements, alpha=0.5, max_reproj_error=10.0, downscale_factor=self.downscale_factor)
@@ -106,13 +114,18 @@ class LoadEstimationNode(Node):
                     #self.publish_camera_load_angle_.publish(error)
                     #self.get_logger().info(f"Published load camera angle: yaw: {yaw:.2f}, pitch: {pitch:.2f}")
 
-                    pose_msg = Vector3()
-                    pose_msg.x = tvec[0][0]
-                    pose_msg.y = tvec[1][0]
-                    pose_msg.z = tvec[2][0]
+                    pose_msg = Pose()
+                    pose_msg.position.x = tvec[0][0]
+                    pose_msg.position.y = tvec[1][0]
+                    pose_msg.position.z = tvec[2][0]
+                    quaternion = R.from_euler('xyz', [rvec[0][0], rvec[1][0], rvec[2][0]], degrees=False).as_quat()
+                    pose_msg.orientation.x = quaternion[0]
+                    pose_msg.orientation.y = quaternion[1]
+                    pose_msg.orientation.z = quaternion[2]
+                    pose_msg.orientation.w = quaternion[3]
                     self.publish_load_pose_.publish(pose_msg)
 
-                    self.get_logger().info(f"Published load pose: x: {pose_msg.x:.2f}, y: {pose_msg.y:.2f}, z: {pose_msg.z:.2f}")
+                    self.get_logger().info(f"Published load pose: x: {pose_msg.position.x:.2f}, y: {pose_msg.position.y:.2f}, z: {pose_msg.position.z:.2f}")
 
                     display_frame = cv_image.copy()
                     for pose in marker_positions:

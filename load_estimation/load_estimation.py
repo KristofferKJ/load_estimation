@@ -33,7 +33,7 @@ class LoadEstimationNode(Node):
         self.subscribe_image_ = self.create_subscription(Image, '/image_raw', self.image_callback, 2)
 
         # ========== timers ==========
-        timer_period = 1/30  # 30 Hz
+        #timer_period = 1/30  # 30 Hz
 
         # Camera intrinsics and distortion
         #intrinsics = np.array([[835.4362078622368, 0, 323.0605420101571],

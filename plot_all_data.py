@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from scipy.spatial.transform import Rotation as R
 
 # ---- CONFIG ----
-csv_path = "dataset.csv"
+csv_path = "Test_1_ns.csv"
 
 # ---- LOAD CSV ----
 p_C_W = []

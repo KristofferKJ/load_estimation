@@ -25,7 +25,6 @@ class LoadEstimationNode(Node):
         self.publish_camera_load_angle_ = self.create_publisher(Vector3, '/gimbal/camera_load_angle', 2)
         self.publish_image_gray_ = self.create_publisher(Image, '/debug/image_gray', 2)
         self.publish_image_thres_ = self.create_publisher(Image, '/debug/image_thres', 2)
-        self.publish_image_detected_ = self.create_publisher(Image, '/debug/image_detected', 2)
         self.publish_image_payload_ = self.create_publisher(Image, '/debug/image_payload', 2)
         self.publish_load_pose_ = self.create_publisher(Pose, '/payload/pose', 2)
 
@@ -74,12 +73,13 @@ class LoadEstimationNode(Node):
         marker_order = 5
         self.MT = MarkerTracker(marker_order, int(13/self.downscale_factor), 1000, marker_ids, self.downscale_factor)
 
+        self.bridge = CvBridge()
 
         self.t0 = time.time()
         self.total_frames = 0
         self.total_time = 0
 
-        self.bridge = CvBridge()
+        
 
     def image_callback(self, msg: Image):
         # Convert ROS Image message to OpenCV format
@@ -91,7 +91,6 @@ class LoadEstimationNode(Node):
 
         marker_positions, debug_image = self.MT.locate_marker(gray)
         self.publish_image_thres_.publish(self.bridge.cv2_to_imgmsg(debug_image.astype(np.uint8), encoding='mono8'))
-        #self.publish_image_detected_.publish(self.bridge.cv2_to_imgmsg(marker_image.astype(np.uint8), encoding='mono8'))
 
         if marker_positions is not None:
             #self.get_logger().info(f"Found {len(marker_positions)} markers.")
@@ -111,7 +110,7 @@ class LoadEstimationNode(Node):
 
                     # Publish the setpoint
                     error = Vector3(x=yaw, y=pitch, z=0.0)
-                    #self.publish_camera_load_angle_.publish(error)
+                    self.publish_camera_load_angle_.publish(error)
                     #self.get_logger().info(f"Published load camera angle: yaw: {yaw:.2f}, pitch: {pitch:.2f}")
 
                     pose_msg = Pose()

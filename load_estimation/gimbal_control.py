@@ -189,12 +189,6 @@ class GimbalControlNode(Node):
         self.center_gimbal()
         time.sleep(2) # wait for gimbal to center
 
-        self.setpoint_1 = [0, 180] # yaw, pitch
-        self.setpoint_2 = [90, 135] # yaw, pitch
-        self.setpoint = self.setpoint_1
-
-        
-
         # ========== Publishers ==========
         self.publish_load_angles_ = self.create_publisher(Vector3, '/gimbal/world_angles', 2)
 
@@ -212,8 +206,8 @@ class GimbalControlNode(Node):
             return
         
         msg = Vector3()
-        msg.x = yaw #+ self.setpoint[0] # add setpoint to get actual angle
-        msg.y = pitch #+ self.setpoint[1] # add setpoint to get actual angle
+        msg.x = yaw # add setpoint to get actual angle
+        msg.y = pitch # add setpoint to get actual angle
         msg.z = roll
         self.publish_load_angles_.publish(msg)
 
@@ -281,28 +275,17 @@ class GimbalControlNode(Node):
         if response and response[2] == '0d':
             data = response[0]
             # FROMsiyi ros SDK 623:
-            #self._att_msg.yaw = toInt(msg[2:4]+msg[0:2]) /10.
-            #self._att_msg.pitch = toInt(msg[6:8]+msg[4:6]) /10.
-            #self._att_msg.roll = toInt(msg[10:12]+msg[8:10]) /10.
-            #self._att_msg.yaw_speed = toInt(msg[14:16]+msg[12:14]) /10.
-            #self._att_msg.pitch_speed = toInt(msg[18:20]+msg[16:18]) /10.
-            #self._att_msg.roll_speed = toInt(msg[22:24]+msg[20:22]) /10
             yaw = toInt(data[2:4]+data[0:2]) / 10.
             pitch = toInt(data[6:8]+data[4:6]) / 10.
             roll = toInt(data[10:12]+data[8:10]) / 10.
-            yaw_speed = toInt(data[14:16]+data[12:14]) / 10.
-            pitch_speed = toInt(data[18:20]+data[16:18]) / 10.
-            roll_speed = toInt(data[22:24]+data[20:22]) / 10.
+            #yaw_speed = toInt(data[14:16]+data[12:14]) / 10.
+            #pitch_speed = toInt(data[18:20]+data[16:18]) / 10.
+            #roll_speed = toInt(data[22:24]+data[20:22]) / 10.
             #print(f"Yaw: {yaw: 6.1f}, Pitch: {pitch: 6.1f}, Roll: {roll: 6.1f}, Yaw Speed: {yaw_speed: 6.1f}, Pitch Speed: {pitch_speed: 6.1f}, Roll Speed: {roll_speed: 6.1f}")
             return yaw, pitch, roll
         return None, None, None
 
         
-
-
-
-
-
 
 def main(args=None):
     rclpy.init(args=args)

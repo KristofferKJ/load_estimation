@@ -23,10 +23,12 @@ class LoadEstimationNode(Node):
 
         # ========== Publishers ==========
         self.publish_camera_load_angle_ = self.create_publisher(Vector3, '/gimbal/camera_load_angle', 2)
+        self.publish_load_pose_ = self.create_publisher(Pose, '/payload/pose', 2)
+
         self.publish_image_gray_ = self.create_publisher(Image, '/debug/image_gray', 2)
         self.publish_image_thres_ = self.create_publisher(Image, '/debug/image_thres', 2)
         self.publish_image_payload_ = self.create_publisher(Image, '/debug/image_payload', 2)
-        self.publish_load_pose_ = self.create_publisher(Pose, '/payload/pose', 2)
+        
 
         # ========== Subscribers ==========
         self.subscribe_image_ = self.create_subscription(Image, '/image_raw', self.image_callback, 2)
@@ -60,12 +62,12 @@ class LoadEstimationNode(Node):
         #                     marker_ids[4]: (-0.3502, 0.0156, 0.0472),
         #                     marker_ids[5]: (-0.2772, -0.2497, -0.0037)}
         
-        marker_placements = {marker_ids[0]: (0.264, -0.264, 0.0),
-                             marker_ids[1]: (0.342, 0.0, -0.05),
-                             marker_ids[2]: (0.264, 0.264, 0.0),
-                             marker_ids[3]: (-0.264, 0.264, 0.0),
-                             marker_ids[4]: (-0.342, 0.0, -0.05),
-                             marker_ids[5]: (-0.264, -0.264, 0.0)}
+        marker_placements = {marker_ids[0]: (-0.264, -0.264, 0.0),
+                             marker_ids[1]: (0.0, -0.342, -0.05),
+                             marker_ids[2]: (0.264, -0.264, 0.0),
+                             marker_ids[3]: (0.264, 0.264, 0.0),
+                             marker_ids[4]: (0.0, 0.342, -0.05),
+                             marker_ids[5]: (-0.264, 0.264, 0.0)}
 
         self.downscale_factor = 1
         self.LP = PoseEstimator(intrinsics, dist_coeffs, marker_ids, marker_placements, alpha=0.5, max_reproj_error=10.0, downscale_factor=self.downscale_factor)

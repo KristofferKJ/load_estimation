@@ -11,7 +11,8 @@ class TransformationNode(Node):
         self.get_logger().info("Transformation Node has been started.")
 
         # ========== Publishers ==========
-        self.publish_drone_payload_vector_ = self.create_publisher(Vector3, '/gimbal/error', 2)
+        self.publish_drone_payload_vector_ = self.create_publisher(Vector3, '/payload/vector', 2)
+        self.publish_payload_world_pose_ = self.create_publisher(Pose, '/payload/world_pose', 2) 
 
         # ========== Subscribers ==========
         self.subscribe_payload_pose_ = self.create_subscription(Pose, '/payload/pose', self.payload_pose_callback, 2)
@@ -89,9 +90,11 @@ class TransformationNode(Node):
         angles = q_P_W.as_euler('xyz', degrees=True)
         self.get_logger().info(f"Payload position in world: {p_P_W[0]:.3f}, {p_P_W[1]:.3f}, {p_P_W[2]:.3f}, angles (deg): {angles[0]:.2f}, {angles[1]:.2f}, {angles[2]:.2f}")
 
-        
+        payload_world_pose = Pose(position=Vector3(x=p_P_W[0], y=p_P_W[1], z=p_P_W[2]), orientation=Vector3(x=angles[0], y=angles[1], z=angles[2]))
+        self.publish_payload_world_pose_.publish(payload_world_pose)
 
-
+        drone_payload_vector = Vector3(x=p_P_W[0] - p_D_W[0], y=p_P_W[1] - p_D_W[1], z=p_P_W[2] - p_D_W[2])
+        self.publish_drone_payload_vector_.publish(drone_payload_vector)
 
 
     def object_pose_world(

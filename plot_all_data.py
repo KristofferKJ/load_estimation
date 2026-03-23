@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 from scipy.spatial.transform import Rotation as R
 
 # ---- CONFIG ----
-csv_path = "Test_1_ns.csv"
+path = "testboard_7"  # path to the CSV file containing the data
+csv_path = f"{path}.csv"
 
 # ---- LOAD CSV ----
 p_C_W = []
@@ -144,3 +145,6 @@ axes[-1].set_xlabel("Sample Index")
 
 plt.tight_layout()
 plt.show()
+
+# save the figure
+fig.savefig(f"error_plots_{path[-1]}.png")

@@ -22,8 +22,8 @@ class SaveDatasetNode(Node):
         # ========== Subscribers ==========
         self.subscribe_load_pose_ = self.create_subscription(Pose, '/payload/pose', self.load_pose_callback, 2)
         # create best effort QOS for the MoCap topics since they can be high frequency and we only care about the latest pose
-        self.subscribe_MoCap_camera_pose_ = self.create_subscription(PoseStamped, '/vrpn_mocap/Camera/pose', self.camera_pose_callback, qos_profile=self.qos_profile)
-        self.subscribe_MoCap_load_pose_ = self.create_subscription(PoseStamped, '/vrpn_mocap/Payload_testing/pose', self.mocap_load_pose_callback, qos_profile=self.qos_profile)
+        self.subscribe_MoCap_camera_pose_ = self.create_subscription(PoseStamped, '/vrpn_mocap/camera_test_setup/pose', self.camera_pose_callback, qos_profile=self.qos_profile)
+        self.subscribe_MoCap_load_pose_ = self.create_subscription(PoseStamped, '/vrpn_mocap/protect_load/pose', self.mocap_load_pose_callback, qos_profile=self.qos_profile)
 
         self.camera_pose = None
         self.mocap_load_pose = None

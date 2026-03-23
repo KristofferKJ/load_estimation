@@ -97,69 +97,6 @@ class TransformationNode(Node):
         self.publish_drone_payload_vector_.publish(drone_payload_vector)
 
 
-    def object_pose_world(
-        p_D, q_D,                 # Drone position and quaternion in world (numpy array, quaternion as [x,y,z,w])
-        theta_x, theta_y, theta_z, # Gimbal measured angles in degrees
-        p_O_C, q_O_C               # Object pose in camera frame
-    ):
-        """
-        Returns object pose in world frame given drone, gimbal, camera measurements.
-
-        p_D: np.array(3,) drone position in world
-        q_D: np.array(4,) drone quaternion in world [x,y,z,w]
-        theta_x, theta_y, theta_z: gimbal measured angles (deg)
-        p_O_C: np.array(3,) object position in camera frame
-        q_O_C: np.array(4,) object orientation in camera frame [x,y,z,w]
-        """
-
-        # 1. Drone → Gimbal base
-        p_G0_D = np.array([0,0,-0.15])  # Gimbal base relative to drone
-        # Gimbal base rotation relative to drone (quaternion)
-        R_G0_D = np.array([[0,0,1],
-                        [0,1,0],
-                        [-1,0,0]])
-        q_G0_D = R.from_matrix(R_G0_D).as_quat()  # [x,y,z,w]
-
-        # 2. Drone in world
-        r_D = R.from_quat(q_D)
-
-        # 3. Gimbal base in world
-        p_G0_W = p_D + r_D.apply(p_G0_D)
-        q_G0_W = r_D * R.from_quat(q_G0_D)
-        print(f"gimbal base position in world: {p_G0_W}, gimbal base orientation in world (quat): {q_G0_W.as_quat()}, angles (deg): {q_G0_W.as_euler('xyz', degrees=True)}")
-
-        # 4. Extract drone yaw (around world Z)
-        yaw_D = np.arctan2(2*(q_D[3]*q_D[2] + q_D[0]*q_D[1]), 1 - 2*(q_D[1]**2 + q_D[2]**2))
-        print(f"Drone yaw (deg): {np.rad2deg(yaw_D):.2f}, Gimbal angles (deg): x={theta_x:.2f}, y={theta_y:.2f}, z={theta_z:.2f}")
-
-        # 5. Compute X-axis compensation rotation based on drone yaw
-        theta_x_eff = theta_x + np.rad2deg(yaw_D)
-        
-        # 6. Build gimbal quaternions
-        q_W_G = np.array([0.0, 0.70710678, 0.0, 0.70710678])  # 90 deg rotation around Y to align gimbal with drone
-        r = R.from_euler('zyx', [theta_z, theta_y, theta_x_eff], degrees=True)
-        q_G = r.as_quat()  # [x,y,z,w]
-        q_G_W = R.from_quat(q_W_G) * R.from_quat(q_G)
-
-        # 7. Camera offset
-        p_C_G = np.array([1,0,0]) # 0.025
-        # Camera rotation relative to gimbal
-        R_C_G = np.array([[0,0,1],
-                        [-1,0,0],
-                        [0,-1,0]])
-        q_C_G = R.from_matrix(R_C_G)
-
-        # Camera pose in world
-        q_C_W = q_G_W * q_C_G
-        p_C_W = p_G0_W + q_G_W.apply(p_C_G)
-        print(f"Camera position in world: {p_C_W}, Camera orientation in world (quat): {q_C_W.as_quat()}, angles (deg): {q_C_W.as_euler('xyz', degrees=True)}")
-
-        # 8. Object pose in world
-        r_O_C = R.from_quat(q_O_C)
-        q_O_W = q_C_W * r_O_C
-        p_O_W = p_C_W + q_C_W.apply(p_O_C)
-
-
 def main(args=None):
     rclpy.init(args=args)
     transformation_node = TransformationNode()

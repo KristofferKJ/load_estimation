@@ -48,13 +48,13 @@ class LoadEstimationNode(Node):
         dist_coeffs = np.array([-2.92583245e-02, 1.00683957e+00, -2.29972697e-03, 9.16865223e-04,-3.11679202e+00], dtype=float)
         
 
-        marker_ids = [17, 27, 39, 119]
-        marker_placements = {marker_ids[0]: (-0.16, -0.16, 0.0),
-                            marker_ids[1]: (0.16, -0.16, 0.0),
-                            marker_ids[2]: (0.16, 0.16, 0.0),
-                            marker_ids[3]: (-0.16, 0.16, 0.0)}
+        #marker_ids = [17, 27, 39, 119]
+        #marker_placements = {marker_ids[0]: (-0.16, -0.16, 0.0),
+        #                    marker_ids[1]: (0.16, -0.16, 0.0),
+        #                    marker_ids[2]: (0.16, 0.16, 0.0),
+        #                    marker_ids[3]: (-0.16, 0.16, 0.0)}
         
-        #marker_ids = [17, 27, 39, 51, 95, 119]
+        marker_ids = [17, 27, 39, 51, 95, 119]
         #marker_placements = {marker_ids[0]: (0.2545, -0.2614, -0.0049),
         #                     marker_ids[1]: (0.3354, 0.0048, 0.0469),
         #                     marker_ids[2]: (0.2648, 0.2665, -0.0079),
@@ -70,6 +70,13 @@ class LoadEstimationNode(Node):
         #                     marker_ids[3]: (0.264, 0.264, 0.0),
         #                     marker_ids[4]: (0.0, 0.342, -0.05),
         #                     marker_ids[5]: (-0.264, 0.264, 0.0)}
+        
+        marker_placements = {marker_ids[0]: (0.264, -0.264, 0.0),
+                             marker_ids[1]: (0.0, -0.342, 0.05),
+                             marker_ids[2]: (-0.264, -0.264, 0.0),
+                             marker_ids[3]: (-0.264, 0.264, 0.0),
+                             marker_ids[4]: (0.0, 0.342, 0.05),
+                             marker_ids[5]: (0.264, 0.264, 0.0)}
 
         self.downscale_factor = 1
         self.LP = PoseEstimator(intrinsics, dist_coeffs, marker_ids, marker_placements, alpha=0.5, max_reproj_error=10.0, downscale_factor=self.downscale_factor)

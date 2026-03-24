@@ -91,7 +91,7 @@ class DynGimbalControl(Node):
         motor_1_error_bits = self.angle_to_bits(msg.x)
         motor_2_error_bits = self.angle_to_bits(msg.y)
         position = [motor_1_error_bits + self.motor_bits[0], motor_2_error_bits + self.motor_bits[1]]
-        self.move_to_position(position)
+        #self.move_to_position(position)
 
     def move_to_position(self, position):
         
@@ -134,7 +134,7 @@ class DynGimbalControl(Node):
                 positions_msg.append(f"ID {dxl_id}: ReadFail")
 
         self.motor_bits = [positions[0], positions[1]]
-        msg.x = self.bits_to_angle(positions[0])
+        msg.x = self.bits_to_angle(positions[0]) - 90
         msg.y = self.bits_to_angle(positions[1])
         msg.z = 0.0
         self.publisher_angles_.publish(msg)

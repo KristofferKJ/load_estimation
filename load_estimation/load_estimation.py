@@ -113,7 +113,7 @@ class LoadEstimationNode(Node):
                     # Publish the setpoint
                     error = Vector3(x=yaw, y=pitch, z=0.0)
                     self.publish_camera_load_angle_.publish(error)
-                    #self.get_logger().info(f"Published load camera angle: yaw: {yaw:.2f}, pitch: {pitch:.2f}")
+                    self.get_logger().info(f"Published load camera angle: yaw: {yaw:.2f}, pitch: {pitch:.2f}")
 
                     pose_msg = Pose()
                     pose_msg.position.x = tvec[0][0]
@@ -140,15 +140,15 @@ class LoadEstimationNode(Node):
                 else:
                     self.get_logger().info("No position estimate.")
                     error = Vector3(x=0.0, y=0.0, z=0.0)
-                    self.publish_camera_load_angle_.publish(error)
+                    #self.publish_camera_load_angle_.publish(error)
             else:
                 self.get_logger().info("Not enough markers detected.")
                 error = Vector3(x=0.0, y=0.0, z=0.0)
-                self.publish_camera_load_angle_.publish(error)
+                #self.publish_camera_load_angle_.publish(error)
         else:
             self.get_logger().info("No markers detected.")
             error = Vector3(x=0.0, y=0.0, z=0.0)
-            self.publish_camera_load_angle_.publish(error)
+            #self.publish_camera_load_angle_.publish(error)
 
                 
 

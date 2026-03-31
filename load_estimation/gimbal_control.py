@@ -200,6 +200,8 @@ class GimbalControlNode(Node):
         self.timer_control = self.create_timer(timer_period, self.control_loop)
         self.timer_pub_angles = self.create_timer(timer_period, self.publish_load_angles) 
 
+        self.setpoint = [0, 0]
+
     def publish_load_angles(self):
         yaw, pitch, roll = self.get_attitude()
         if yaw is None or pitch is None:
@@ -278,10 +280,10 @@ class GimbalControlNode(Node):
             yaw = toInt(data[2:4]+data[0:2]) / 10.
             pitch = toInt(data[6:8]+data[4:6]) / 10.
             roll = toInt(data[10:12]+data[8:10]) / 10.
-            #yaw_speed = toInt(data[14:16]+data[12:14]) / 10.
-            #pitch_speed = toInt(data[18:20]+data[16:18]) / 10.
-            #roll_speed = toInt(data[22:24]+data[20:22]) / 10.
-            #print(f"Yaw: {yaw: 6.1f}, Pitch: {pitch: 6.1f}, Roll: {roll: 6.1f}, Yaw Speed: {yaw_speed: 6.1f}, Pitch Speed: {pitch_speed: 6.1f}, Roll Speed: {roll_speed: 6.1f}")
+            yaw_speed = toInt(data[14:16]+data[12:14]) / 10.
+            pitch_speed = toInt(data[18:20]+data[16:18]) / 10.
+            roll_speed = toInt(data[22:24]+data[20:22]) / 10.
+            print(f"Yaw: {yaw: 6.1f}, Pitch: {pitch: 6.1f}, Roll: {roll: 6.1f}") #, Yaw Speed: {yaw_speed: 6.1f}, Pitch Speed: {pitch_speed: 6.1f}, Roll Speed: {roll_speed: 6.1f}")
             return yaw, pitch, roll
         return None, None, None
 

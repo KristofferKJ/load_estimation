@@ -91,7 +91,7 @@ class DynGimbalControl(Node):
         motor_1_error_bits = self.angle_to_bits(msg.x)
         motor_2_error_bits = self.angle_to_bits(msg.y)
         position = [motor_1_error_bits + self.motor_bits[0], motor_2_error_bits + self.motor_bits[1]]
-        #self.move_to_position(position)
+        self.move_to_position(position)
 
     def move_to_position(self, position):
         

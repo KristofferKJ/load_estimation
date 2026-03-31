@@ -62,12 +62,21 @@ class LoadEstimationNode(Node):
         #                     marker_ids[4]: (-0.3502, 0.0156, 0.0472),
         #                     marker_ids[5]: (-0.2772, -0.2497, -0.0037)}
         
-        marker_placements = {marker_ids[0]: (-0.264, -0.264, 0.0),
-                             marker_ids[1]: (0.0, -0.342, -0.05),
-                             marker_ids[2]: (0.264, -0.264, 0.0),
-                             marker_ids[3]: (0.264, 0.264, 0.0),
-                             marker_ids[4]: (0.0, 0.342, -0.05),
-                             marker_ids[5]: (-0.264, 0.264, 0.0)}
+
+        # ========== These for the current payload design with 6 markers ==========
+        #marker_placements = {marker_ids[0]: (-0.264, -0.264, 0.0),
+        #                     marker_ids[1]: (0.0, -0.342, -0.05),
+        #                     marker_ids[2]: (0.264, -0.264, 0.0),
+        #                     marker_ids[3]: (0.264, 0.264, 0.0),
+        #                     marker_ids[4]: (0.0, 0.342, -0.05),
+        #                     marker_ids[5]: (-0.264, 0.264, 0.0)}
+        
+        marker_placements = {marker_ids[0]: (0.264, -0.264, 0.0),
+                             marker_ids[1]: (0.0, -0.342, 0.05),
+                             marker_ids[2]: (-0.264, -0.264, 0.0),
+                             marker_ids[3]: (-0.264, 0.264, 0.0),
+                             marker_ids[4]: (0.0, 0.342, 0.05),
+                             marker_ids[5]: (0.264, 0.264, 0.0)}
 
         self.downscale_factor = 1
         self.LP = PoseEstimator(intrinsics, dist_coeffs, marker_ids, marker_placements, alpha=0.5, max_reproj_error=10.0, downscale_factor=self.downscale_factor)

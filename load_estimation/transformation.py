@@ -78,7 +78,7 @@ class TransformationNode(Node):
         p_C_W = p_G_W + q_G_W.apply(p_C_G)
         q_C_W = q_G_W * R.from_quat(q_C_G)
         angles = q_C_W.as_euler('xyz', degrees=True)
-        self.get_logger().info(f"Camera position in world: {p_C_W[0]:.3f}, {p_C_W[1]:.3f}, {p_C_W[2]:.3f}, angles (deg): {angles[0]:.2f}, {angles[1]:.2f}, {angles[2]:.2f}")
+        #self.get_logger().info(f"Camera position in world: {p_C_W[0]:.3f}, {p_C_W[1]:.3f}, {p_C_W[2]:.3f}, angles (deg): {angles[0]:.2f}, {angles[1]:.2f}, {angles[2]:.2f}")
 
         # 8. Camera -> Payload
         p_P_C = np.array([self.payload_pose.position.x, self.payload_pose.position.y, self.payload_pose.position.z])
@@ -102,7 +102,6 @@ class TransformationNode(Node):
 
         drone_payload_vector = Vector3(x=p_P_W[0] - p_D_W[0], y=p_P_W[1] - p_D_W[1], z=p_P_W[2] - p_D_W[2])
         self.publish_drone_payload_vector_.publish(drone_payload_vector)
-
 
 def main(args=None):
     rclpy.init(args=args)

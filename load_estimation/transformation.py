@@ -32,7 +32,7 @@ class TransformationNode(Node):
         self.payload_pose = Pose()
         self.drone_pose = PoseStamped()
 
-        self.d_drone_to_gimbal = 0.15 # 15 cm from drone to gimbal
+        self.d_drone_to_gimbal = 0.107 # 15 cm from drone to gimbal
         self.d_gimbal_to_camera = 0.025 # 2.5 cm from gimbal to camera
 
 
@@ -78,7 +78,7 @@ class TransformationNode(Node):
         p_C_W = p_G_W + q_G_W.apply(p_C_G)
         q_C_W = q_G_W * R.from_quat(q_C_G)
         angles = q_C_W.as_euler('xyz', degrees=True)
-        self.get_logger().info(f"Camera position in world: {p_C_W[0]:.3f}, {p_C_W[1]:.3f}, {p_C_W[2]:.3f}, angles (deg): {angles[0]:.2f}, {angles[1]:.2f}, {angles[2]:.2f}")
+        #self.get_logger().info(f"Camera position in world: {p_C_W[0]:.3f}, {p_C_W[1]:.3f}, {p_C_W[2]:.3f}, angles (deg): {angles[0]:.2f}, {angles[1]:.2f}, {angles[2]:.2f}")
 
         # 8. Camera -> Payload
         p_P_C = np.array([self.payload_pose.position.x, self.payload_pose.position.y, self.payload_pose.position.z])
@@ -90,12 +90,18 @@ class TransformationNode(Node):
         angles = q_P_W.as_euler('xyz', degrees=True)
         self.get_logger().info(f"Payload position in world: {p_P_W[0]:.3f}, {p_P_W[1]:.3f}, {p_P_W[2]:.3f}, angles (deg): {angles[0]:.2f}, {angles[1]:.2f}, {angles[2]:.2f}")
 
-        #payload_world_pose = Pose(position=Vector3(x=p_P_W[0], y=p_P_W[1], z=p_P_W[2]), orientation=Vector3(x=angles[0], y=angles[1], z=angles[2]))
-        #self.publish_payload_world_pose_.publish(payload_world_pose)
+        payload_world_pose_msg = Pose()
+        payload_world_pose_msg.position.x=p_P_W[0]
+        payload_world_pose_msg.position.y=p_P_W[1]
+        payload_world_pose_msg.position.z=p_P_W[2]
+        payload_world_pose_msg.orientation.x = q_P_W.as_quat()[0]
+        payload_world_pose_msg.orientation.y = q_P_W.as_quat()[1]
+        payload_world_pose_msg.orientation.z = q_P_W.as_quat()[2]
+        payload_world_pose_msg.orientation.w = q_P_W.as_quat()[3]
+        self.publish_payload_world_pose_.publish(payload_world_pose_msg)
 
-        #drone_payload_vector = Vector3(x=p_P_W[0] - p_D_W[0], y=p_P_W[1] - p_D_W[1], z=p_P_W[2] - p_D_W[2])
-        #self.publish_drone_payload_vector_.publish(drone_payload_vector)
-
+        drone_payload_vector = Vector3(x=p_P_W[0] - p_D_W[0], y=p_P_W[1] - p_D_W[1], z=p_P_W[2] - p_D_W[2])
+        self.publish_drone_payload_vector_.publish(drone_payload_vector)
 
 def main(args=None):
     rclpy.init(args=args)

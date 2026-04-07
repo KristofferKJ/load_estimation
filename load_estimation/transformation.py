@@ -20,7 +20,7 @@ class TransformationNode(Node):
 
         # ========== Publishers ==========
         self.publish_drone_payload_vector_ = self.create_publisher(Vector3, '/payload/vector', 2)
-        self.publish_payload_world_pose_ = self.create_publisher(Pose, '/payload/world_pose', 2) 
+        self.publish_payload_world_pose_ = self.create_publisher(PoseStamped, '/payload/world_pose', 2) 
 
         # ========== Subscribers ==========
         self.subscribe_payload_pose_ = self.create_subscription(Pose, '/payload/pose', self.payload_pose_callback, 2)
@@ -64,7 +64,7 @@ class TransformationNode(Node):
         #self.get_logger().info(f"Gimbal base position in world: {p_G0_W}, Gimbal base orientation in world (quat): {q_G0_W.as_quat()}, angles (deg): {q_G0_W.as_euler('xyz', degrees=True)}")
 
         # 4. Gimbal base -> Gimbal (pure rotation)
-        q_G_G0 = R.from_euler('XY', [self.gimbal_angles.x, self.gimbal_angles.y], degrees=True).as_quat()  # [x,y,z,w]
+        q_G_G0 = R.from_euler('XY', [self.gimbal_angles.x+1.8, self.gimbal_angles.y-3.8], degrees=True).as_quat()  # [x,y,z,w]
 
         # 5. World -> Gimbal
         p_G_W = p_G0_W
@@ -90,14 +90,17 @@ class TransformationNode(Node):
         angles = q_P_W.as_euler('xyz', degrees=True)
         self.get_logger().info(f"Payload position in world: {p_P_W[0]:.3f}, {p_P_W[1]:.3f}, {p_P_W[2]:.3f}, angles (deg): {angles[0]:.2f}, {angles[1]:.2f}, {angles[2]:.2f}")
 
-        payload_world_pose_msg = Pose()
-        payload_world_pose_msg.position.x=p_P_W[0]
-        payload_world_pose_msg.position.y=p_P_W[1]
-        payload_world_pose_msg.position.z=p_P_W[2]
-        payload_world_pose_msg.orientation.x = q_P_W.as_quat()[0]
-        payload_world_pose_msg.orientation.y = q_P_W.as_quat()[1]
-        payload_world_pose_msg.orientation.z = q_P_W.as_quat()[2]
-        payload_world_pose_msg.orientation.w = q_P_W.as_quat()[3]
+        payload_world_pose_msg = PoseStamped()
+        payload_world_pose_msg.header.stamp = self.get_clock().now().to_msg()
+        payload_world_pose_msg.header.frame_id = "world"
+        payload_world_pose_msg.pose.position.x = p_P_W[0]
+        payload_world_pose_msg.pose.position.y = p_P_W[1]
+        payload_world_pose_msg.pose.position.z = p_P_W[2]
+        payload_world_pose_msg.pose.orientation.x = q_P_W.as_quat()[0]
+        payload_world_pose_msg.pose.orientation.y = q_P_W.as_quat()[1]
+        payload_world_pose_msg.pose.orientation.z = q_P_W.as_quat()[2]
+        payload_world_pose_msg.pose.orientation.w = q_P_W.as_quat()[3]
+
         self.publish_payload_world_pose_.publish(payload_world_pose_msg)
 
         drone_payload_vector = Vector3(x=p_P_W[0] - p_D_W[0], y=p_P_W[1] - p_D_W[1], z=p_P_W[2] - p_D_W[2])

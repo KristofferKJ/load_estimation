@@ -79,7 +79,7 @@ class LoadEstimationNode(Node):
                              marker_ids[5]: (0.264, 0.264, 0.0)}
 
         self.downscale_factor = 1
-        self.LP = PoseEstimator(intrinsics, dist_coeffs, marker_ids, marker_placements, alpha=0.5, max_reproj_error=10.0, downscale_factor=self.downscale_factor)
+        self.LP = PoseEstimator(intrinsics, dist_coeffs, marker_ids, marker_placements, alpha=0.25, max_reproj_error=10.0, downscale_factor=self.downscale_factor)
 
         marker_order = 5
         self.MT = MarkerTracker(marker_order, int(13/self.downscale_factor), 1000, marker_ids, self.downscale_factor)

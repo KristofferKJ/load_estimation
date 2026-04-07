@@ -107,6 +107,7 @@ class PoseEstimator:
             #else:
             #    raise RuntimeError("No previous pose available to fallback")
 
+        
         # --- 5. smooth pose with previous frame ---
         if self.prev_rvec is not None:
             # Rotation smoothing via Rodrigues + SLERP approximation

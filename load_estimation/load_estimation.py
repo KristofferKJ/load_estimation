@@ -128,14 +128,15 @@ class LoadEstimationNode(Node):
                     pose_msg.position.x = tvec[0][0]
                     pose_msg.position.y = tvec[1][0]
                     pose_msg.position.z = tvec[2][0]
-                    quaternion = R.from_euler('xyz', [rvec[0][0], rvec[1][0], rvec[2][0]], degrees=False).as_quat()
-                    pose_msg.orientation.x = quaternion[0]
-                    pose_msg.orientation.y = quaternion[1]
-                    pose_msg.orientation.z = quaternion[2]
-                    pose_msg.orientation.w = quaternion[3]
+                    R_mat, _ = cv2.Rodrigues(rvec)
+                    R_quat = R.from_matrix(R_mat).as_quat()  # [x, y, z, w]
+                    pose_msg.orientation.x = R_quat[0]
+                    pose_msg.orientation.y = R_quat[1]
+                    pose_msg.orientation.z = R_quat[2]
+                    pose_msg.orientation.w = R_quat[3]
                     self.publish_load_pose_.publish(pose_msg)
 
-                    self.get_logger().info(f"Published load pose: x: {pose_msg.position.x:.2f}, y: {pose_msg.position.y:.2f}, z: {pose_msg.position.z:.2f}")
+                    #self.get_logger().info(f"Published load pose: x: {pose_msg.position.x:.2f}, y: {pose_msg.position.y:.2f}, z: {pose_msg.position.z:.2f}")
 
                     display_frame = cv_image.copy()
                     for pose in marker_positions:

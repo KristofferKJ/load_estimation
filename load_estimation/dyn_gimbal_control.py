@@ -14,7 +14,6 @@ from dynamixel_sdk import *  # Uses Dynamixel SDK library
 ADDR_TORQUE_ENABLE       = 64
 ADDR_GOAL_POSITION       = 116
 ADDR_PRESENT_POSITION    = 132
-ADDR_PRESENT_CURRENT     = 126   # 2 bytes, signed
 LEN_GOAL_POSITION        = 4
 
 # Protocol version
@@ -29,10 +28,6 @@ TORQUE_ENABLE            = 1
 TORQUE_DISABLE           = 0
 DXL_MIN_POS              = [525, 0]
 DXL_MAX_POS              = [1539, 1350]   # XL430 has 0–4095 for 0–360°
-
-# Torque constant conversion factors
-CURRENT_RESOLUTION_mA     = 2.69   # per unit
-TORQUE_CONSTANT_mNm_per_mA = 1.38  # from datasheet
 
 # Initialize PortHandler and PacketHandler
 portHandler = PortHandler(DEVICENAME)

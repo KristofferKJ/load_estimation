@@ -55,7 +55,7 @@ class DynGimbalControl(Node):
 
         # ==================== Timers ====================
         timer_period = 1/30  # seconds
-        self.timer = self.create_timer(timer_period, self.motor_positions)
+        self.timer = self.create_timer(timer_period, self.read_motor_angles)
 
 
         # ==================== Dynamixel Initialization ====================
@@ -77,7 +77,7 @@ class DynGimbalControl(Node):
         
         # Move to initial position 
         initial_position = [1024, 1024] # 90 degrees for both motors
-        self.move_to_position(initial_position)
+        self.set_motor_goal_angle(initial_position)
         self.get_logger().info(f"Moving to initial position: {initial_position}")
 
         
@@ -86,9 +86,9 @@ class DynGimbalControl(Node):
         motor_1_error_bits = self.angle_to_bits(msg.x)
         motor_2_error_bits = self.angle_to_bits(msg.y)
         position = [motor_1_error_bits + self.motor_bits[0], motor_2_error_bits + self.motor_bits[1]]
-        self.move_to_position(position)
+        self.set_motor_goal_angle(position)
 
-    def move_to_position(self, position):
+    def set_motor_goal_angle(self, position):
         
         for dxl_id, pos in zip(DXL_IDs, position):
             # Ensure position is within limits
@@ -110,7 +110,7 @@ class DynGimbalControl(Node):
             self.get_logger().error(f"Failed to send SyncWrite: {packetHandler.getTxRxResult(dxl_comm_result)}")
         groupSyncWrite.clearParam()
 
-    def motor_positions(self):
+    def read_motor_angles(self):
         msg = Vector3()
 
         positions = []

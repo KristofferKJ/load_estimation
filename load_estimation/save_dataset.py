@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped, Pose, Vector3
+from nmpc_interfaces.msg import State
 
 from rclpy.qos import QoSProfile, HistoryPolicy, ReliabilityPolicy, DurabilityPolicy
 
@@ -28,10 +29,14 @@ class SaveDatasetNode(Node):
         self.subscribe_gimbal_angles_ = self.create_subscription(Vector3, '/gimbal/angles', self.gimbal_angles_callback, 2)
         #self.subscribe_payload_world_pose_ = self.create_subscription(Pose, '/payload/world_pose', self.load_pose_world_callback, 2)
 
+        self.subscribe_nmpc_estimated_state_ = self.create_subscription(State, '/nmpc/estimated_state', self.nmpc_estimated_state_callback, qos_profile=self.qos_profile)
+        self.subscribe_nmpc_estimated_state_ukf_ = self.create_subscription(State, '/nmpc/estimated_state_ukf', self.nmpc_estimated_state_ukf_callback, qos_profile=self.qos_profile)
+
         self.camera_pose = None
         self.mocap_load_pose = None
         self.mocap_drone_pose = None
         self.gimbal_angles = Vector3()
+        self.nmpc_estimated_state = State()
 
 
     def camera_pose_callback(self, msg):
@@ -148,6 +153,27 @@ class SaveDatasetNode(Node):
         else:
             self.get_logger().warning("MoCap load pose is not available yet.")
 
+    def nmpc_estimated_state_callback(self, msg):
+        self.nmpc_estimated_state = msg
+        
+
+    def nmpc_estimated_state_ukf_callback(self, msg):
+        self.nmpc_estimated_state_ukf = msg
+
+        nmpc = self.nmpc_estimated_state
+        nmpc_ukf = self.nmpc_estimated_state_ukf
+
+        with open('dataset_nmpc.csv', 'a') as f:
+            f.write(f"{nmpc.load_position[0]},{nmpc.load_position[1]},{nmpc.load_position[2]},"
+                    f"{nmpc.load_velocity[0]},{nmpc.load_velocity[1]},{nmpc.load_velocity[2]},"
+                    f"{nmpc.cable_vector[0]},{nmpc.cable_vector[1]},{nmpc.cable_vector[2]},"
+                    f"{nmpc.load_angular_velocity[0]},{nmpc.load_angular_velocity[1]},{nmpc.load_angular_velocity[2]},"
+                    f"{nmpc_ukf.load_position[0]},{nmpc_ukf.load_position[1]},{nmpc_ukf.load_position[2]},"
+                    f"{nmpc_ukf.load_velocity[0]},{nmpc_ukf.load_velocity[1]},{nmpc_ukf.load_velocity[2]},"
+                    f"{nmpc_ukf.cable_vector[0]},{nmpc_ukf.cable_vector[1]},{nmpc_ukf.cable_vector[2]},"
+                    f"{nmpc_ukf.load_angular_velocity[0]},{nmpc_ukf.load_angular_velocity[1]},{nmpc_ukf.load_angular_velocity[2]}\n")
+        
+        self.get_logger().info("NMPC dataset entry saved.")
 
 
 def main(args=None):

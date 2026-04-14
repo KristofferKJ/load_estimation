@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from scipy.spatial.transform import Rotation as R
 
 # ---- CONFIG ----
-path = "/home/rasmus-storm/Desktop/tests/02_04_kalman_tuning/dataset_world"  # path to the CSV file containing the data
+path = "/home/rasmus-storm/Desktop/tests/08_04_combined/dataset"  # path to the CSV file containing the data
 csv_path = f"{path}.csv"
 
 # ---- LOAD CSV ----

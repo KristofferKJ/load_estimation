@@ -64,7 +64,7 @@ class TransformationNode(Node):
         #self.get_logger().info(f"Gimbal base position in world: {p_G0_W}, Gimbal base orientation in world (quat): {q_G0_W.as_quat()}, angles (deg): {q_G0_W.as_euler('xyz', degrees=True)}")
 
         # 4. Gimbal base -> Gimbal (pure rotation)
-        q_G_G0 = R.from_euler('XY', [self.gimbal_angles.x+1.8, self.gimbal_angles.y-3.8], degrees=True).as_quat()  # [x,y,z,w]
+        q_G_G0 = R.from_euler('XY', [self.gimbal_angles.x+2.3, self.gimbal_angles.y-1.3], degrees=True).as_quat()  # [x,y,z,w]
 
         # 5. World -> Gimbal
         p_G_W = p_G0_W

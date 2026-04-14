@@ -5,7 +5,7 @@ from scipy.spatial.transform import Rotation as R
 import numpy as np
 
 # ---- CONFIG ----
-path = "/home/rasmus-storm/Desktop/tests/07_04_no_damp/shut_5_gain_255"  # path to the CSV file containing the data
+path = "/home/rasmus-storm/Desktop/tests/08_04_combined/z_vel_weight_e-1/dataset"  # path to the CSV file containing the data
 csv_path = f"{path}.csv"
 
 # ---- LOAD CSV ----
@@ -34,7 +34,7 @@ with open(csv_path, newline='') as f:
 p_L_W_est = []
 q_L_W_est = []
 
-skip_frames = 5
+skip_frames = 75
 
 p_D_W_mocap = p_D_W_mocap[skip_frames:]  # skip header
 q_D_W_mocap = q_D_W_mocap[skip_frames:]
@@ -60,7 +60,7 @@ for p_d_w, q_d_w, p_l_c, q_l_c, r_g_g0 in zip(p_D_W_mocap, q_D_W_mocap, p_L_C, q
     #self.get_logger().info(f"Gimbal base position in world: {p_G0_W}, Gimbal base orientation in world (quat): {q_G0_W.as_quat()}, angles (deg): {q_G0_W.as_euler('xyz', degrees=True)}")
 
     # 4. Gimbal base -> Gimbal (pure rotation)
-    q_G_G0 = R.from_euler('XY', [r_g_g0[0]+1.8, r_g_g0[1]-3.8], degrees=True).as_quat()  # [x,y,z,w]
+    q_G_G0 = R.from_euler('XY', [r_g_g0[0]+2.3, r_g_g0[1]-1.3], degrees=True).as_quat()  # [x,y,z,w]
 
     # 5. World -> Gimbal
     p_G_W = p_G0_W

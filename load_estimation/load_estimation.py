@@ -78,21 +78,32 @@ class LoadEstimationNode(Node):
                              marker_ids[4]: (0.0, 0.342, 0.05),
                              marker_ids[5]: (0.264, 0.264, 0.0)}
 
+        # ========== Tuning parameters ==========
         self.downscale_factor = 1
-        self.LP = PoseEstimator(intrinsics, dist_coeffs, marker_ids, marker_placements, alpha=0.25, max_reproj_error=10.0, downscale_factor=self.downscale_factor)
 
-        marker_order = 5
-        self.MT = MarkerTracker(marker_order, int(13/self.downscale_factor), 1000, marker_ids, self.downscale_factor)
+        # Marker parameters
+        self.n_folds = 5            # Marker symmetry order
+        self.marker_pixels = 28     # Diameter of the marker in pixels at the expected distance (3.1m)
+        self.nfold_percent = 0.50    # How much of the marker radius is used for n-fold symmetry detection (0-1)
+        self.scale_factor = 1
+        self.threshold_marker = 0.25 # Relative threshold for marker detection (0-1), relative to the max response in the image
+
+        # Pose estimation parameters
+        self.alpha = 0.0
+        self.max_reproj_error = 10.0
+
 
         self.bridge = CvBridge()
+        self.MT = MarkerTracker(self.n_folds, self.marker_pixels, self.nfold_percent, self.scale_factor, self.threshold_marker, marker_ids, self.downscale_factor)
+        self.LP = PoseEstimator(intrinsics, dist_coeffs, marker_ids, marker_placements, alpha=self.alpha, max_reproj_error=self.max_reproj_error, downscale_factor=self.downscale_factor)
+        
 
-        self.t0 = time.time()
-        self.total_frames = 0
-        self.total_time = 0
+        
 
         
 
     def image_callback(self, msg: Image):
+        start_time = time.time()
         # Convert ROS Image message to OpenCV format
         cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
         gray = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
@@ -142,7 +153,7 @@ class LoadEstimationNode(Node):
                     for pose in marker_positions:
                         x = int(pose.x * self.downscale_factor)
                         y = int(pose.y * self.downscale_factor)
-                        cv2.circle(display_frame, (x, y), 10, (0, 255, 0), 2)
+                        cv2.circle(display_frame, (x, y), 14, (0, 255, 0), 1)
                         cv2.putText(display_frame, f"{pose.id}", (x + 10, y + 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
 
                     self.LP.display_pose(display_frame)
@@ -159,6 +170,9 @@ class LoadEstimationNode(Node):
             self.get_logger().info("No markers detected.")
             error = Vector3(x=0.0, y=0.0, z=0.0)
             #self.publish_camera_load_angle_.publish(error)
+        end_time = time.time()
+        processing_time = end_time - start_time
+        self.get_logger().info(f"Processing time: {processing_time:.3f} seconds")
 
                 
 

@@ -6,12 +6,16 @@ from load_estimation.marker_detection.MarkerPose import MarkerPose
 from load_estimation.marker_detection.decode import decode_marker
 
 class MarkerTracker:
-    def __init__(self, order, kernel_size, scale_factor, marker_ids, downscale_factor=1):
+    def __init__(self, order, marker_size, nfold_percent, scale_factor, threshold_marker, marker_ids, downscale_factor=1):
+        # Calculate kernel size based on marker size and downscale factor
+        kernel_size = int(marker_size * nfold_percent / downscale_factor)
         (kernel_real, kernel_imag) = self.generate_symmetry_detector_kernel(order, kernel_size)
 
         self.order = order
         self.mat_real = kernel_real / scale_factor
         self.mat_imag = kernel_imag / scale_factor
+
+        self.threshold_marker = threshold_marker
 
         # showing the kernels
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(self.mat_real)
@@ -26,8 +30,8 @@ class MarkerTracker:
         self.x2 = int(math.ceil(float(kernel_size)/2))
 
         # Using codering to id markers
-        r_code_inner = int(math.floor(7/downscale_factor)) #int(21/downscale_factor) 14
-        self.r_code_outer = int(math.ceil(15/downscale_factor)) #int(32/downscale_factor) 20
+        r_code_inner = int(math.floor((marker_size * nfold_percent / downscale_factor)/2)) #int(21/downscale_factor) 14
+        self.r_code_outer = int(math.ceil((marker_size / downscale_factor)/2)) #int(32/downscale_factor) 20
         bits = 8
         transitions = 2
         self.decoder = decode_marker(r_code_inner, self.r_code_outer, bits, transitions, marker_ids)
@@ -59,7 +63,7 @@ class MarkerTracker:
 
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(frame_sum_squared)
 
-        threshold_value = max_val * 0.25 #0.5
+        threshold_value = max_val * self.threshold_marker 
 
         thres_img = np.where(frame_sum_squared > threshold_value, frame_sum_squared, 0)
         min_val, max_val_thresh, min_loc, max_loc_thresh = cv2.minMaxLoc(thres_img)

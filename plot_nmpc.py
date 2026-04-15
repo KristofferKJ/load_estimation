@@ -2,7 +2,8 @@ import csv
 import matplotlib.pyplot as plt
 import numpy as np
 
-path = "/home/rasmus-storm/Desktop/tests/08_04_combined/distributed_computing_2/dataset_nmpc"  # path to the CSV file containing the data
+path = "/home/rasmus-storm/Desktop/tests/14_04_bias_estimation/video_20/dataset_nmpc"  # path to the CSV file containing the data
+
 csv_path = f"{path}.csv"
 
 # Load CSV file
@@ -15,7 +16,12 @@ columns = list(zip(*data))
 
 # Split into two segments (first 12 and next 12 columns)
 segment1 = columns[:12]
+norm = np.linalg.norm(segment1[6:9], axis=0)
+print(norm)
+segment1[6:9] = np.divide(segment1[6:9], norm)
 segment2 = columns[12:24]
+
+estimated_bias = columns[24]
 
 #error = np.subtract(np.array(segment2[5]), np.array(segment1[5]))
 #mean_error = np.mean(error)
@@ -37,4 +43,10 @@ for i in range(0, 12, 3):
         ax.grid(True)
 
 plt.tight_layout()
+plt.show()
+
+
+fig2, ax2 = plt.subplots()
+lines = ax2.plot(estimated_bias)
+
 plt.show()

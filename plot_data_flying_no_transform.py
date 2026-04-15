@@ -5,7 +5,7 @@ from scipy.spatial.transform import Rotation as R
 import numpy as np
 
 # ---- CONFIG ----
-path = "/home/rasmus-storm/Desktop/tests/08_04_combined/z_vel_weight_e-1/dataset"  # path to the CSV file containing the data
+path = "/home/rasmus-storm/Desktop/tests/14_04_bias_estimation/video_20/dataset_25"  # path to the CSV file containing the data
 csv_path = f"{path}.csv"
 
 # ---- LOAD CSV ----

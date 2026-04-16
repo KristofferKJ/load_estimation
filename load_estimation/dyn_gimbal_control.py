@@ -22,7 +22,7 @@ PROTOCOL_VERSION         = 2.0
 # Default setting
 DXL_IDs                  = [0,1]   # Motor IDs
 BAUDRATE                 = 57600
-DEVICENAME               = '/dev/ttyUSB0'  # Update with your port
+DEVICENAME               = '/dev/ttyUSB0' 
 
 TORQUE_ENABLE            = 1
 TORQUE_DISABLE           = 0

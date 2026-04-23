@@ -5,7 +5,7 @@ from scipy.spatial.transform import Rotation as R
 import numpy as np
 
 # ---- CONFIG ----
-path = "/home/rasmus-storm/Desktop/tests/20_04/rosbag_5/dataset"
+path = "/home/rasmus-storm/Desktop/tests/20_04/rosbag_2/dataset"
 csv_path = f"{path}.csv"
 
 fs = 30.0  # Hz
@@ -37,15 +37,16 @@ with open(csv_path, newline='') as f:
 # ---- SKIP FRAMES ----
 skip_frames = 75
 cut_frames = 1#1500
+Allign_frames = 0#1500
 
 
-p_D_W_mocap = p_D_W_mocap[skip_frames:-cut_frames]
-q_D_W_mocap = q_D_W_mocap[skip_frames:-cut_frames]
-p_L_C = p_L_C[skip_frames:-cut_frames]
-q_L_C = q_L_C[skip_frames:-cut_frames]
-p_L_W_mocap = p_L_W_mocap[skip_frames:-cut_frames]
-q_L_W_mocap = q_L_W_mocap[skip_frames:-cut_frames]
-R_G_G0 = R_G_G0[skip_frames:-cut_frames]
+p_D_W_mocap = p_D_W_mocap[skip_frames:-cut_frames-Allign_frames]
+q_D_W_mocap = q_D_W_mocap[skip_frames:-cut_frames-Allign_frames]
+p_L_C = p_L_C[skip_frames+Allign_frames:-cut_frames]
+q_L_C = q_L_C[skip_frames+Allign_frames:-cut_frames]
+p_L_W_mocap = p_L_W_mocap[skip_frames+Allign_frames:-cut_frames]
+q_L_W_mocap = q_L_W_mocap[skip_frames+Allign_frames:-cut_frames]
+R_G_G0 = R_G_G0[skip_frames+Allign_frames:-cut_frames]
 
 # ---- ESTIMATION ----
 p_L_W_est = []
@@ -63,7 +64,7 @@ for p_d_w, q_d_w, p_l_c, q_l_c, r_g_g0 in zip(
     p_G0_W = p_d_w + r_d_w.apply(p_G0_D)
     q_G0_W = r_d_w * R.from_quat(q_G0_D)
 
-    q_G_G0 = R.from_euler('XY', [r_g_g0[0] + 2.17, r_g_g0[1] - 1.33], degrees=True).as_quat() #2.2 # 1.35
+    q_G_G0 = R.from_euler('XY', [r_g_g0[0] + 2.17, r_g_g0[1] - 1.33], degrees=True).as_quat() #2.17 # 1.33
 
     p_G_W = p_G0_W
     q_G_W = q_G0_W * R.from_quat(q_G_G0)

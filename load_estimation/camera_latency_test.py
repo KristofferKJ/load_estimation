@@ -63,7 +63,7 @@ class LedImageTimerNode(Node):
                 self.LED_turned_on = False
                 self.turn_LED_on = False
                 self.LED_turn_on_counter = 0
-                self.get_logger().info("Center pixel bright → LED turned OFF and timer stopped")
+                #self.get_logger().info("Center pixel bright → LED turned OFF and timer stopped")
 
     def led_timer_callback(self):
         # turn on LED 20 after frame_interval frames.
@@ -74,7 +74,7 @@ class LedImageTimerNode(Node):
                 self.led.set_value(1)  # Turn on LED
                 self.LED_turned_on = True
                 self.start_timer()  # Start timer when LED is turned on
-                self.get_logger().info("LED turned ON")
+                #self.get_logger().info("LED turned ON")
 
 
          

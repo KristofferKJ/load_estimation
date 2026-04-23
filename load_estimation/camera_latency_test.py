@@ -12,38 +12,39 @@ class LedImageTimerNode(Node):
 
     def __init__(self):
         super().__init__('led_image_timer_node')
+        self.get_logger().info("Initializing LED Image Timer Node")
 
-        # ---------------- CONFIG ----------------
-        self.frame_interval = 30     # blink every N frames
-        self.brightness_threshold = 180  # 0–255 scale
+        # ========== Subscribers ==========
+        self.subscription = self.create_subscription(Image, '/image_raw', self.image_callback, 10)
 
-        # ---------------- GPIO ----------------
+        # ========== Timers ==========
+        timer_period = 1/1000  # Check every 1/1000 sec for brightness (adjust as needed)
+        self.timer_LED = self.create_timer(timer_period, self.led_timer_callback)
+
+        # ========== GPIO Setup ==========
         self.chip = gpiod.Chip('/dev/gpiochip4')
         self.led = self.chip.get_line(17)
         self.led.request(consumer="led", type=gpiod.LINE_REQ_DIR_OUT)
 
-        # ---------------- ROS ----------------
-        self.subscription = self.create_subscription(
-            Image,
-            '/image_raw',
-            self.image_callback,
-            10
-        )
+        # ========== CONFIG ==========
+        self.frame_interval = 30     # blink every N frames
+        self.turn_LED_on_x_ms_after_frame = 20  # ms after frame to turn on LED
+        self.brightness_threshold = 180  # 0–255 scale
 
         self.bridge = CvBridge()
 
-        # ---------------- STATE ----------------
+        # ========== STATE ==========
         self.frame_count = 0
+        self.LED_turn_on_counter = 0
         self.led_state = False
+        self.turn_LED_on = False
+        self.LED_turned_on = False
 
         self.timer_running = False
         self.start_time = None
 
         self.get_logger().info("Brightness-based LED Timer Node started")
 
-    # =========================================================
-    # CALLBACK
-    # =========================================================
     def image_callback(self, msg):
 
         frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
@@ -52,18 +53,26 @@ class LedImageTimerNode(Node):
 
         # ---------------- LED BLINK ----------------
         if self.frame_count % self.frame_interval == 0:
-
-            self.led_state = not self.led_state
-            self.led.set_value(int(self.led_state))
-
-            if self.led_state and not self.timer_running:
-                self.start_timer()
+            self.turn_LED_on = True
 
         # ---------------- MONITOR CENTER PIXEL ----------------
         if self.timer_running:
-
             if self.is_center_pixel_bright(frame):
                 self.stop_timer()
+
+    def led_timer_callback(self):
+        # turn on LED 20 after frame_interval frames.
+        if self.turn_LED_on:
+            self.LED_turn_on_counter += 1
+
+            if self.LED_turn_on_counter == self.turn_LED_on_x_ms_after_frame:
+                self.led.set_value(1)  # Turn on LED
+                self.LED_turned_on = True
+                self.start_timer()  # Start timer when LED is turned on
+                self.get_logger().info("LED turned ON")
+
+
+         
 
     # =========================================================
     # TIMER

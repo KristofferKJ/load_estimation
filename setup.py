@@ -30,6 +30,7 @@ setup(
             'video_writer_node = load_estimation.write_video:main',
             'save_dateset_node = load_estimation.save_dataset:main',
             'dyn_gimbal_control_node = load_estimation.dyn_gimbal_control:main',
+            'camera_latency_node = load_estimation.camera_latency_test:main',
             #'camera_driver_node = load_estimation.camera_driver:main',
         ],
     },

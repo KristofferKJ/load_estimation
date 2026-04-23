@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
+from std_msgs.msg import Bool
 from cv_bridge import CvBridge
 
 import numpy as np
@@ -13,6 +14,9 @@ class LedImageTimerNode(Node):
     def __init__(self):
         super().__init__('led_image_timer_node')
         self.get_logger().info("Initializing LED Image Timer Node")
+
+        # ========== Publishers ==========
+        self.publish_tim_call_ = self.create_publisher(Bool, '/tim_call', 2)
 
         # ========== Subscribers ==========
         self.subscription = self.create_subscription(Image, '/image_raw', self.image_callback, 10)
@@ -28,8 +32,8 @@ class LedImageTimerNode(Node):
 
         # ========== CONFIG ==========
         self.frame_interval = 30     # blink every N frames
-        self.turn_LED_on_x_ms_after_frame = 20  # ms after frame to turn on LED
-        self.brightness_threshold = 180  # 0–255 scale
+        self.turn_LED_on_x_ms_after_frame = 5  # ms after frame to turn on LED
+        self.brightness_threshold = 15  # 0–255 scale
 
         self.bridge = CvBridge()
 
@@ -66,6 +70,9 @@ class LedImageTimerNode(Node):
                 #self.get_logger().info("Center pixel bright → LED turned OFF and timer stopped")
 
     def led_timer_callback(self):
+        msg = Bool()
+        msg.data = True
+        self.publish_tim_call_.publish(msg)
         # turn on LED 20 after frame_interval frames.
         if self.turn_LED_on:
             self.LED_turn_on_counter += 1
@@ -107,6 +114,7 @@ class LedImageTimerNode(Node):
 
         # luminance (standard perceived brightness)
         brightness = 0.114 * b + 0.587 * g + 0.299 * r
+        self.get_logger().info(f"brightness: {brightness:.4f}")
 
         return brightness > self.brightness_threshold
 

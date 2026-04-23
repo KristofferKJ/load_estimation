@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
-from std_msgs.msg import Bool
+from std_msgs.msg import Float64
 from cv_bridge import CvBridge
 
 import numpy as np
@@ -16,7 +16,7 @@ class LedImageTimerNode(Node):
         self.get_logger().info("Initializing LED Image Timer Node")
 
         # ========== Publishers ==========
-        self.publish_tim_call_ = self.create_publisher(Bool, '/tim_call', 2)
+        self.publish_timer_ = self.create_publisher(Float64, '/timer', 2)
 
         # ========== Subscribers ==========
         self.subscription = self.create_subscription(Image, '/image_raw', self.image_callback, 10)
@@ -31,17 +31,12 @@ class LedImageTimerNode(Node):
         self.led.request(consumer="led", type=gpiod.LINE_REQ_DIR_OUT)
 
         # ========== CONFIG ==========
-        self.frame_interval = 30     # blink every N frames
-        self.turn_LED_on_x_ms_after_frame = 5  # ms after frame to turn on LED
-        self.brightness_threshold = 15  # 0–255 scale
+        self.brightness_threshold = 127  # 0–255 scale
 
         self.bridge = CvBridge()
 
         # ========== STATE ==========
-        self.frame_count = 0
-        self.LED_turn_on_counter = 0
-        self.led_state = False
-        self.turn_LED_on = False
+        self.LED_counter = 0
         self.LED_turned_on = False
 
         self.timer_running = False
@@ -53,35 +48,25 @@ class LedImageTimerNode(Node):
 
         frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
 
-        self.frame_count += 1
-
-        # ---------------- LED BLINK ----------------
-        if self.frame_count % self.frame_interval == 0:
-            self.turn_LED_on = True
-
         # ---------------- MONITOR CENTER PIXEL ----------------
         if self.timer_running:
-            if self.is_center_pixel_bright(frame):
+            b, g, r = frame[120, 160]  # Center pixel (320x240 resolution)
+            if self.is_center_pixel_bright(b, g, r):
                 self.stop_timer()
-                self.led.set_value(0)  # Turn off LED
-                self.LED_turned_on = False
-                self.turn_LED_on = False
-                self.LED_turn_on_counter = 0
-                #self.get_logger().info("Center pixel bright → LED turned OFF and timer stopped")
+
 
     def led_timer_callback(self):
-        msg = Bool()
-        msg.data = True
-        self.publish_tim_call_.publish(msg)
-        # turn on LED 20 after frame_interval frames.
-        if self.turn_LED_on:
-            self.LED_turn_on_counter += 1
+        if self.LED_counter == 937:
+            self.led.set_value(1)
+            self.LED_turned_on = True
+            self.start_timer()  # Start timer when LED is turned on
+        if self.LED_counter == 997:
+            self.led.set_value(0)
+            self.LED_turned_on = False
 
-            if self.LED_turn_on_counter == self.turn_LED_on_x_ms_after_frame:
-                self.led.set_value(1)  # Turn on LED
-                self.LED_turned_on = True
-                self.start_timer()  # Start timer when LED is turned on
-                #self.get_logger().info("LED turned ON")
+            self.LED_counter = 0
+
+        self.LED_counter += 1
 
 
          
@@ -96,6 +81,9 @@ class LedImageTimerNode(Node):
 
     def stop_timer(self):
         elapsed = time.time() - self.start_time
+        msg = Float64()
+        msg.data = elapsed
+        self.publish_timer_.publish(msg)
 
         self.timer_running = False
         self.start_time = None
@@ -105,12 +93,10 @@ class LedImageTimerNode(Node):
     # =========================================================
     # BRIGHTNESS CHECK
     # =========================================================
-    def is_center_pixel_bright(self, frame):
+    def is_center_pixel_bright(self, b, g, r):
 
-        h, w, _ = frame.shape
-        cx, cy = w // 2, h // 2
-
-        b, g, r = frame[cy, cx]
+        # luminance (standard perceived brightness)
+        brightness = 0.114 * b + 0.587 * g + 0.299 * r
 
         # luminance (standard perceived brightness)
         brightness = 0.114 * b + 0.587 * g + 0.299 * r

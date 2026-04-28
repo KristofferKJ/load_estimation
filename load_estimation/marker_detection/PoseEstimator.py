@@ -108,8 +108,8 @@ class PoseEstimator:
             #    raise RuntimeError("No previous pose available to fallback")
 
         
-        # --- 5. smooth pose with previous frame ---
-        if self.prev_rvec is not None:
+        # --- 5. smooth pose with previous frame --- (not used as it causes lag in the position estimate)
+        if self.prev_rvec is not None and self.alpha > 0:
             # Rotation smoothing via Rodrigues + SLERP approximation
             R_prev, _ = cv2.Rodrigues(self.prev_rvec)
             R_curr, _ = cv2.Rodrigues(refined_rvec)

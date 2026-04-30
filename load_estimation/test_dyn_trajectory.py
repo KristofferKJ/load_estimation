@@ -150,6 +150,7 @@ class DynGimbalControl(Node):
         else:
             target_position = self.pos_2
 
+        self.positions = [self.bits_to_angle(pos) for pos in target_position]
         self.set_motor_goal_angle(target_position)
         self.get_logger().info(f"Changing position to: {target_position}")
         self.change_pos = not self.change_pos

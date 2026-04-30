@@ -4,14 +4,14 @@ import matplotlib.pyplot as plt
 # -----------------------
 # Path
 # -----------------------
-path = "/home/rasmus-storm/Desktop/tests/14_04_bias_estimation/video_19/dataset_nmpc"
+path = "/home/rasmus-storm/Desktop/tests/28_04/rosbag_9/dataset_nmpc"
 csv_path = f"{path}.csv"
 
 # -----------------------
 # USER नियंत्रLED WINDOW (EDIT THESE)
 # -----------------------
-start_idx = 4250      # <-- start sample
-end_idx = 6000     # <-- end sample (None = use full length)
+start_idx = 10 #860 #4250      # <-- start sample
+end_idx = -1 #1200 #6000     # <-- end sample (None = use full length)
 
 # -----------------------
 # Load CSV

@@ -182,6 +182,25 @@ class SaveDatasetNode(Node):
                         f"{nmpc_bias}\n")
             
             self.get_logger().info("NMPC dataset entry saved.")
+        else:
+            self.nmpc_estimated_state_ukf = msg
+
+            nmpc = self.nmpc_estimated_state
+            nmpc_ukf = self.nmpc_estimated_state_ukf
+            nmpc_bias = 0
+
+            with open('dataset_nmpc.csv', 'a') as f:
+                f.write(f"{nmpc.load_position[0]},{nmpc.load_position[1]},{nmpc.load_position[2]},"
+                        f"{nmpc.load_velocity[0]},{nmpc.load_velocity[1]},{nmpc.load_velocity[2]},"
+                        f"{nmpc.cable_vector[0]},{nmpc.cable_vector[1]},{nmpc.cable_vector[2]},"
+                        f"{nmpc.load_angular_velocity[0]},{nmpc.load_angular_velocity[1]},{nmpc.load_angular_velocity[2]},"
+                        f"{nmpc_ukf.load_position[0]},{nmpc_ukf.load_position[1]},{nmpc_ukf.load_position[2]},"
+                        f"{nmpc_ukf.load_velocity[0]},{nmpc_ukf.load_velocity[1]},{nmpc_ukf.load_velocity[2]},"
+                        f"{nmpc_ukf.cable_vector[0]},{nmpc_ukf.cable_vector[1]},{nmpc_ukf.cable_vector[2]},"
+                        f"{nmpc_ukf.load_angular_velocity[0]},{nmpc_ukf.load_angular_velocity[1]},{nmpc_ukf.load_angular_velocity[2]},"
+                        f"{nmpc_bias}\n")
+            
+            self.get_logger().info("NMPC dataset entry saved.")
 
 
 def main(args=None):

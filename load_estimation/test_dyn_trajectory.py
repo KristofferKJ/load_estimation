@@ -56,6 +56,7 @@ class DynGimbalControl(Node):
         # ==================== Timers ====================
         timer_period = 1/30  # seconds
         self.timer = self.create_timer(timer_period, self.read_motor_angles)
+        self.timer_pos_change_ = self.create_timer(1, self.change_position)
 
 
         # ==================== Dynamixel Initialization ====================
@@ -75,6 +76,9 @@ class DynGimbalControl(Node):
         # Store motor positions in bits for offset handling
         self.motor_bits = [0, 0]
         self.positions = [0, 0]
+        self.pos_1 = [1024, 1024]
+        self.pos_2 = [800, 1200]
+        self.change_pos = False
         
         # Move to initial position 
         initial_position = [1024, 1024] # 90 degrees for both motors
@@ -139,6 +143,17 @@ class DynGimbalControl(Node):
         with open('trajectory_log.txt', 'a') as f:
             f.write(f"{rclpy.clock.Clock().now().nanoseconds * 1e-9}: {self.positions[0]}, {self.positions[1]}, {msg.x}, {msg.y}\n")
         self.get_logger().info(" | ".join(positions_msg))
+
+    def change_position(self):
+        if self.change_pos:
+            target_position = self.pos_1
+        else:
+            target_position = self.pos_2
+
+        self.set_motor_goal_angle(target_position)
+        self.get_logger().info(f"Changing position to: {target_position}")
+        self.change_pos = not self.change_pos
+
 
     def angle_to_bits(self, angle_deg):
         # Convert angle in degrees to bits (0-4095 for 0-360°)

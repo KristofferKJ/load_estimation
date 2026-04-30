@@ -109,10 +109,10 @@ class LoadEstimationNode(Node):
         gray = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
 
         # Publish the grayscale image for debugging
-        self.publish_image_gray_.publish(self.bridge.cv2_to_imgmsg(gray, encoding='mono8'))
+        #self.publish_image_gray_.publish(self.bridge.cv2_to_imgmsg(gray, encoding='mono8'))
 
         marker_positions, debug_image = self.MT.locate_marker(gray)
-        self.publish_image_thres_.publish(self.bridge.cv2_to_imgmsg(debug_image.astype(np.uint8), encoding='mono8'))
+        #self.publish_image_thres_.publish(self.bridge.cv2_to_imgmsg(debug_image.astype(np.uint8), encoding='mono8'))
 
         if marker_positions is not None:
             #self.get_logger().info(f"Found {len(marker_positions)} markers.")
@@ -149,15 +149,15 @@ class LoadEstimationNode(Node):
 
                     #self.get_logger().info(f"Published load pose: x: {pose_msg.position.x:.2f}, y: {pose_msg.position.y:.2f}, z: {pose_msg.position.z:.2f}")
 
-                    display_frame = cv_image.copy()
-                    for pose in marker_positions:
-                        x = int(pose.x * self.downscale_factor)
-                        y = int(pose.y * self.downscale_factor)
-                        cv2.circle(display_frame, (x, y), 14, (0, 255, 0), 1)
-                        cv2.putText(display_frame, f"{pose.id}", (x + 10, y + 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+                    #display_frame = cv_image.copy()
+                    #for pose in marker_positions:
+                    #    x = int(pose.x * self.downscale_factor)
+                    #    y = int(pose.y * self.downscale_factor)
+                    #    cv2.circle(display_frame, (x, y), 14, (0, 255, 0), 1)
+                    #    cv2.putText(display_frame, f"{pose.id}", (x + 10, y + 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
 
-                    self.LP.display_pose(display_frame)
-                    self.publish_image_payload_.publish(self.bridge.cv2_to_imgmsg(display_frame, encoding='bgr8'))
+                    #self.LP.display_pose(display_frame)
+                    #self.publish_image_payload_.publish(self.bridge.cv2_to_imgmsg(display_frame, encoding='bgr8'))
                 else:
                     self.get_logger().info("No position estimate.")
                     error = Vector3(x=0.0, y=0.0, z=0.0)

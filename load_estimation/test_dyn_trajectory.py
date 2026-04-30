@@ -141,7 +141,7 @@ class DynGimbalControl(Node):
         self.publisher_angles_.publish(msg)
 
         with open('trajectory_log.txt', 'a') as f:
-            f.write(f"{rclpy.clock.Clock().now().nanoseconds * 1e-9}: {self.positions[0]}, {self.positions[1]}, {msg.x}, {msg.y}\n")
+            f.write(f"{rclpy.clock.Clock().now().nanoseconds * 1e-9}: {self.positions[0]}, {self.positions[1]}, {msg.x+90}, {msg.y}\n")
         self.get_logger().info(" | ".join(positions_msg))
 
     def change_position(self):

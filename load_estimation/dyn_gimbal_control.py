@@ -54,7 +54,7 @@ class DynGimbalControl(Node):
         )
 
         # ==================== Timers ====================
-        timer_period = 1/30  # seconds
+        timer_period = 1/100  # seconds
         self.timer = self.create_timer(timer_period, self.read_motor_angles)
 
 

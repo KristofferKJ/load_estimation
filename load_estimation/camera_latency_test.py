@@ -31,7 +31,7 @@ class LedImageTimerNode(Node):
         self.led.request(consumer="led", type=gpiod.LINE_REQ_DIR_OUT)
 
         # ========== CONFIG ==========
-        self.brightness_threshold = 127  # 0–255 scale
+        self.brightness_threshold = 10  # 0–255 scale
 
         self.bridge = CvBridge()
 
@@ -50,17 +50,17 @@ class LedImageTimerNode(Node):
 
         # ---------------- MONITOR CENTER PIXEL ----------------
         if self.timer_running:
-            b, g, r = frame[120, 160]  # Center pixel (320x240 resolution)
+            b, g, r = frame[0, 160]  # Center pixel (320x240 resolution)
             if self.is_center_pixel_bright(b, g, r):
                 self.stop_timer()
 
 
     def led_timer_callback(self):
-        if self.LED_counter == 937:
+        if self.LED_counter == 65:
             self.led.set_value(1)
             self.LED_turned_on = True
             self.start_timer()  # Start timer when LED is turned on
-        if self.LED_counter == 997:
+        if self.LED_counter == 71:
             self.led.set_value(0)
             self.LED_turned_on = False
 
@@ -77,7 +77,7 @@ class LedImageTimerNode(Node):
     def start_timer(self):
         self.start_time = time.time()
         self.timer_running = True
-        self.get_logger().info("Timer started")
+        #self.get_logger().info("Timer started")
 
     def stop_timer(self):
         elapsed = time.time() - self.start_time
@@ -89,6 +89,8 @@ class LedImageTimerNode(Node):
         self.start_time = None
 
         self.get_logger().info(f"BRIGHT DETECTED → elapsed time: {elapsed:.4f} sec")
+        with open('camera_latency_25_top.csv', 'a') as f:
+            f.write(f"{elapsed}\n")
 
     # =========================================================
     # BRIGHTNESS CHECK
@@ -99,8 +101,8 @@ class LedImageTimerNode(Node):
         brightness = 0.114 * b + 0.587 * g + 0.299 * r
 
         # luminance (standard perceived brightness)
-        brightness = 0.114 * b + 0.587 * g + 0.299 * r
-        self.get_logger().info(f"brightness: {brightness:.4f}")
+        #brightness = 0.114 * b + 0.587 * g + 0.299 * r
+        #self.get_logger().info(f"brightness: {brightness:.4f}")
 
         return brightness > self.brightness_threshold
 

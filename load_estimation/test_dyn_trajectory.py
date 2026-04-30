@@ -77,7 +77,7 @@ class DynGimbalControl(Node):
         self.motor_bits = [0, 0]
         self.positions = [0, 0]
         self.pos_1 = [1024, 1024]
-        self.pos_2 = [800, 1200]
+        self.pos_2 = [824, 1224]
         self.change_pos = False
         
         # Move to initial position 

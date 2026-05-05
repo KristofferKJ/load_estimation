@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 # -----------------------
 # Path
 # -----------------------
-path = "/home/rasmus-storm/Desktop/tests/28_04/rosbag_9/dataset_nmpc"
+path = "/home/rasmus-storm/Desktop/tests/01_05/rosbag_7/dataset_nmpc"
 csv_path = f"{path}.csv"
 
 # -----------------------

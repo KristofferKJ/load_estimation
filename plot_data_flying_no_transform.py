@@ -5,7 +5,7 @@ from scipy.spatial.transform import Rotation as R
 import numpy as np
 
 # ---- CONFIG ----
-path = "/home/rasmus-storm/Desktop/tests/28_04/rosbag_9/dataset"
+path = "/home/rasmus-storm/Desktop/tests/01_05/rosbag_7/dataset"
 csv_path = f"{path}.csv"
 
 fs = 30.0  # Hz

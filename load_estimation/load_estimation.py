@@ -25,9 +25,9 @@ class LoadEstimationNode(Node):
         self.publish_camera_load_angle_ = self.create_publisher(Vector3, '/gimbal/camera_load_angle', 2)
         self.publish_load_pose_ = self.create_publisher(Pose, '/payload/pose', 2)
 
-        self.publish_image_gray_ = self.create_publisher(Image, '/debug/image_gray', 2)
-        self.publish_image_thres_ = self.create_publisher(Image, '/debug/image_thres', 2)
-        self.publish_image_payload_ = self.create_publisher(Image, '/debug/image_payload', 2)
+        #self.publish_image_gray_ = self.create_publisher(Image, '/debug/image_gray', 2)
+        #self.publish_image_thres_ = self.create_publisher(Image, '/debug/image_thres', 2)
+        #self.publish_image_payload_ = self.create_publisher(Image, '/debug/image_payload', 2)
         
 
         # ========== Subscribers ==========
@@ -89,7 +89,7 @@ class LoadEstimationNode(Node):
         self.threshold_marker = 0.25 # Relative threshold for marker detection (0-1), relative to the max response in the image
 
         # Pose estimation parameters
-        self.alpha = 0.0
+        self.alpha = 0.25
         self.max_reproj_error = 10.0
 
 
